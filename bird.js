@@ -181,7 +181,7 @@ class Bird {
     this.history = this.history.slice(-30);
   }
 
-  drawbird(ctx, DRAW_TRAIL) {
+  drawbird(ctx) {
     let bird = this;
     const angle = Math.atan2(bird.dy, bird.dx);
     ctx.translate(bird.x, bird.y);
