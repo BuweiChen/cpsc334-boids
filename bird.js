@@ -1,9 +1,33 @@
+const visualRange = 100;
+
 class Bird {
-  constructor(width, height) {
+  constructor(
+    width,
+    height,
+    speedLimit = 8,
+    turnFactor = 0.25,
+    centeringFactor = 0.002,
+    avoidFactor = 0.02,
+    pAvoidFactor = 0.01,
+    minDistance = 20,
+    matchingFactor = 0.02,
+    size = 1,
+    color = "#" +
+      (0x1000000 + Math.random() * 0xffffff).toString(16).substring(1, 7)
+  ) {
     this.x = Math.random() * width;
     this.y = Math.random() * height;
     this.dx = Math.random() * 10 - 5;
     this.dy = Math.random() * 10 - 5;
+    this.color = color;
+    this.speedLimit = speedLimit;
+    this.turnFactor = turnFactor;
+    this.centeringFactor = centeringFactor;
+    this.avoidFactor = avoidFactor;
+    this.pAvoidFactor = pAvoidFactor;
+    this.minDistance = minDistance;
+    this.matchingFactor = matchingFactor;
+    this.size = size;
     this.history = [];
   }
 
@@ -28,25 +52,23 @@ class Bird {
   keepWithinBounds() {
     let bird = this;
     const margin = 200;
-    const turnFactor = 0.3;
 
     if (bird.x < margin) {
-      bird.dx += turnFactor;
+      bird.dx += this.turnFactor;
     }
     if (bird.x > width - margin) {
-      bird.dx -= turnFactor;
+      bird.dx -= this.turnFactor;
     }
     if (bird.y < margin) {
-      bird.dy += turnFactor;
+      bird.dy += this.turnFactor;
     }
     if (bird.y > height - margin) {
-      bird.dy -= turnFactor;
+      bird.dy -= this.turnFactor;
     }
   }
 
   flyTowardsCenter(birds) {
     let bird = this;
-    const centeringFactor = 0.002; // adjust velocity by this %
 
     let centerX = 0;
     let centerY = 0;
@@ -64,33 +86,43 @@ class Bird {
       centerX = centerX / numNeighbors;
       centerY = centerY / numNeighbors;
 
-      bird.dx += (centerX - bird.x) * centeringFactor;
-      bird.dy += (centerY - bird.y) * centeringFactor;
+      bird.dx += (centerX - bird.x) * this.centeringFactor;
+      bird.dy += (centerY - bird.y) * this.centeringFactor;
     }
   }
 
   avoidOthers(birds) {
     let bird = this;
-    const minDistance = 20; // The distance to stay away from other birds
-    const avoidFactor = 0.02; // Adjust velocity by this %
     let moveX = 0;
     let moveY = 0;
     for (let otherbird of birds) {
       if (otherbird !== bird) {
-        if (bird.distance(otherbird) < minDistance) {
+        if (bird.distance(otherbird) < this.minDistance) {
           moveX += bird.x - otherbird.x;
           moveY += bird.y - otherbird.y;
         }
       }
     }
 
-    bird.dx += moveX * avoidFactor;
-    bird.dy += moveY * avoidFactor;
+    bird.dx += moveX * this.avoidFactor;
+    bird.dy += moveY * this.avoidFactor;
+  }
+
+  avoidPredator(predator) {
+    let moveX = 0;
+    let moveY = 0;
+
+    if (this.distance(predator) < visualRange) {
+      moveX += this.x - predator.x;
+      moveY += this.y - predator.y;
+    }
+
+    this.dx += moveX * this.pAvoidFactor;
+    this.dy += moveY * this.pAvoidFactor;
   }
 
   matchVelocity(birds) {
     let bird = this;
-    const matchingFactor = 0.02; // Adjust by this % of average velocity
 
     let avgDX = 0;
     let avgDY = 0;
@@ -108,26 +140,26 @@ class Bird {
       avgDX = avgDX / numNeighbors;
       avgDY = avgDY / numNeighbors;
 
-      bird.dx += (avgDX - bird.dx) * matchingFactor;
-      bird.dy += (avgDY - bird.dy) * matchingFactor;
+      bird.dx += (avgDX - bird.dx) * this.matchingFactor;
+      bird.dy += (avgDY - bird.dy) * this.matchingFactor;
     }
   }
 
   limitSpeed() {
     let bird = this;
-    const speedLimit = 8;
 
     const speed = Math.sqrt(bird.dx * bird.dx + bird.dy * bird.dy);
-    if (speed > speedLimit) {
-      bird.dx = (bird.dx / speed) * speedLimit;
-      bird.dy = (bird.dy / speed) * speedLimit;
+    if (speed > this.speedLimit) {
+      bird.dx = (bird.dx / speed) * this.speedLimit;
+      bird.dy = (bird.dy / speed) * this.speedLimit;
     }
   }
 
-  update(birds) {
+  update(birds, predator) {
     // Update the velocities according to each rule
     this.flyTowardsCenter(birds);
     this.avoidOthers(birds);
+    this.avoidPredator(predator);
     this.matchVelocity(birds);
     this.limitSpeed();
     this.keepWithinBounds();
@@ -146,17 +178,18 @@ class Bird {
     ctx.translate(bird.x, bird.y);
     ctx.rotate(angle);
     ctx.translate(-bird.x, -bird.y);
-    ctx.fillStyle = "#558cf4";
+    // ctx.fillStyle = "#558cf4";
+    ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(bird.x, bird.y);
-    ctx.lineTo(bird.x - 15, bird.y + 5);
-    ctx.lineTo(bird.x - 15, bird.y - 5);
+    ctx.lineTo(bird.x - 15 * this.size, bird.y + 5 * this.size);
+    ctx.lineTo(bird.x - 15 * this.size, bird.y - 5 * this.size);
     ctx.lineTo(bird.x, bird.y);
     ctx.fill();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     if (DRAW_TRAIL) {
-      ctx.strokeStyle = "#558cf466";
+      ctx.strokeStyle = this.color + "66";
       ctx.beginPath();
       ctx.moveTo(bird.history[0][0], bird.history[0][1]);
       for (const point of bird.history) {

@@ -1,24 +1,26 @@
-
 class Predator extends Bird {
-  constructor(x, y, speed, turnRate, color, size) {
-    super(x, y, speed, turnRate, color, size);
+  constructor(width, height) {
+    super(width, height, 6, 0.25, 0.001, -0.02, 0, visualRange, 0, 1.75, "red");
   }
 
-  draw(ctx) {
-    ctx.save(); // Save the current context state
+  avoidOthers(birds) {
+    let bird = this;
+    let moveX = 0;
+    let moveY = 0;
+    for (let otherbird of birds) {
+      if (otherbird !== bird) {
+        if (bird.distance(otherbird) < this.minDistance) {
+          moveX += bird.x - otherbird.x;
+          moveY += bird.y - otherbird.y;
+        }
+      }
+    }
 
-    ctx.translate(this.position.x, this.position.y);
-    ctx.rotate(this.angle);
+    bird.dx += moveX * this.avoidFactor;
+    bird.dy += moveY * this.avoidFactor;
+  }
 
-    // Draw the predator as a larger triangle pointing in the direction of velocity
-    ctx.beginPath();
-    ctx.moveTo(0, -this.size - 10); // Top of the triangle (larger)
-    ctx.lineTo(this.size / 2 + 10, this.size + 10); // Bottom-right of the triangle
-    ctx.lineTo(-this.size / 2 - 10, this.size + 10); // Bottom-left of the triangle
-    ctx.closePath();
-    ctx.fillStyle = "red";
-    ctx.fill();
-
-    ctx.restore(); // Restore the original context state
+  avoidPredator(predator) {
+    return;
   }
 }

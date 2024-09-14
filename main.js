@@ -1,27 +1,29 @@
 let width = 150;
 let height = 150;
 const numBirds = 100;
-const visualRange = 100;
 const DRAW_TRAIL = true;
 
-let birds = [];
+let prey_birds = [];
+let all_birds;
 
 function initBirds() {
   for (let i = 0; i < numBirds; i++) {
-    birds.push(BirdFactory.createBird(width, height));
+    prey_birds.push(BirdFactory.createBird(width, height));
   }
+  all_birds = prey_birds.slice();
+  all_birds.push(new Predator(width, height));
 }
 
 function animationLoop() {
   // Update each bird
-  for (let bird of birds) {
-    bird.update(birds);
+  for (let bird of all_birds) {
+    bird.update(prey_birds, all_birds[all_birds.length - 1]);
   }
 
   // Clear the canvas and redraw all the birds in their current positions
   const ctx = document.getElementById("simulation").getContext("2d");
   ctx.clearRect(0, 0, width, height);
-  for (let bird of birds) {
+  for (let bird of all_birds) {
     bird.drawbird(ctx);
   }
 
