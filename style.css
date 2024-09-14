@@ -1,8 +1,5 @@
-html, body {
+body {
   margin: 0;
+  background: #282c34;
   overflow: hidden;
-}
-
-canvas {
-  display: block;
 }
