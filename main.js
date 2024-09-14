@@ -1,3 +1,5 @@
+// TODO: make predator have more vision, have some sort of reproductive mechanism for prey
+
 let width = 150;
 let height = 150;
 const numBirds = 100;
