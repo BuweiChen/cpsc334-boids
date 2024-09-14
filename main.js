@@ -27,6 +27,8 @@ function animationLoop() {
     bird.drawbird(ctx);
   }
 
+  prey_birds = prey_birds.filter((bird) => !bird.dead);
+
   // Schedule the next frame
   window.requestAnimationFrame(animationLoop);
 }

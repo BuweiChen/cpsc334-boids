@@ -23,4 +23,19 @@ class Predator extends Bird {
   avoidPredator(predator) {
     return;
   }
+
+  update(birds, predator) {
+    // Update the velocities according to each rule
+    this.flyTowardsCenter(birds);
+    this.avoidOthers(birds);
+    this.matchVelocity(birds);
+    this.limitSpeed();
+    this.keepWithinBounds();
+
+    // Update the position based on the current velocity
+    this.x += this.dx;
+    this.y += this.dy;
+    this.history.push([this.x, this.y]);
+    this.history = this.history.slice(-30);
+  }
 }

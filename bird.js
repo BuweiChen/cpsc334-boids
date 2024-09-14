@@ -1,4 +1,5 @@
 const visualRange = 100;
+const gravity = 0.2;
 
 class Bird {
   constructor(
@@ -28,6 +29,7 @@ class Bird {
     this.minDistance = minDistance;
     this.matchingFactor = matchingFactor;
     this.size = size;
+    this.dead = false;
     this.history = [];
   }
 
@@ -156,20 +158,27 @@ class Bird {
   }
 
   update(birds, predator) {
-    // Update the velocities according to each rule
-    this.flyTowardsCenter(birds);
-    this.avoidOthers(birds);
-    this.avoidPredator(predator);
-    this.matchVelocity(birds);
-    this.limitSpeed();
-    this.keepWithinBounds();
+    if (this.distance(predator) < 15) {
+      this.dead = true;
+      this.color = 'grey';
+    }
+    if (!this.dead) {
+      // Update the velocities according to each rule
+      this.flyTowardsCenter(birds);
+      this.avoidOthers(birds);
+      this.avoidPredator(predator);
+      this.matchVelocity(birds);
+      this.limitSpeed();
+      this.keepWithinBounds();
+    } else {
+      this.dy += gravity;
+    }
 
     // Update the position based on the current velocity
     this.x += this.dx;
     this.y += this.dy;
     this.history.push([this.x, this.y]);
     this.history = this.history.slice(-30);
-    console.log(this.x, this.y);
   }
 
   drawbird(ctx, DRAW_TRAIL) {
