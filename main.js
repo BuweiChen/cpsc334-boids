@@ -50,8 +50,9 @@ window.onload = () => {
   window.addEventListener("resize", sizeCanvas, false);
   sizeCanvas();
 
-  // Randomly distribute the boids to start
   initBirds();
+
+  console.log(width, height);
 
   // Schedule the main animation loop
   window.requestAnimationFrame(animationLoop);

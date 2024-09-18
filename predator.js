@@ -1,6 +1,19 @@
 class Predator extends Bird {
   constructor(width, height) {
-    super(width, height, 6, 0.25, 0.001, -0.02, 0, visualRange, 0, 1.75, "red");
+    super(
+      width,
+      height,
+      150,
+      6,
+      0.8,
+      0.001,
+      -0.02,
+      0,
+      150,
+      0,
+      (1.75 * Math.min(width, height)) / 600,
+      "#FF0000"
+    );
   }
 
   avoidOthers(birds) {

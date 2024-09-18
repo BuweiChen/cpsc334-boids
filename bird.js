@@ -1,18 +1,18 @@
-const visualRange = 100;
 const gravity = 0.2;
 
 class Bird {
   constructor(
     width,
     height,
+    visualRange = 125,
     speedLimit = 8,
-    turnFactor = 0.25,
+    turnFactor = 0.8,
     centeringFactor = 0.002,
     avoidFactor = 0.02,
     pAvoidFactor = 0.01,
     minDistance = 20,
     matchingFactor = 0.02,
-    size = 1,
+    size = Math.min(width, height) / 600,
     color = "#" +
       (0x1000000 + Math.random() * 0xffffff).toString(16).substring(1, 7)
   ) {
@@ -20,6 +20,7 @@ class Bird {
     this.y = Math.random() * height;
     this.dx = Math.random() * 10 - 5;
     this.dy = Math.random() * 10 - 5;
+    this.visualRange = visualRange;
     this.color = color;
     this.speedLimit = speedLimit;
     this.turnFactor = turnFactor;
@@ -77,7 +78,7 @@ class Bird {
     let numNeighbors = 0;
 
     for (let otherbird of birds) {
-      if (bird.distance(otherbird) < visualRange) {
+      if (bird.distance(otherbird) < this.visualRange) {
         centerX += otherbird.x;
         centerY += otherbird.y;
         numNeighbors += 1;
@@ -114,7 +115,7 @@ class Bird {
     let moveX = 0;
     let moveY = 0;
 
-    if (this.distance(predator) < visualRange) {
+    if (this.distance(predator) < this.visualRange) {
       moveX += this.x - predator.x;
       moveY += this.y - predator.y;
     }
@@ -131,7 +132,7 @@ class Bird {
     let numNeighbors = 0;
 
     for (let otherbird of birds) {
-      if (bird.distance(otherbird) < visualRange) {
+      if (bird.distance(otherbird) < this.visualRange) {
         avgDX += otherbird.dx;
         avgDY += otherbird.dy;
         numNeighbors += 1;
@@ -158,9 +159,9 @@ class Bird {
   }
 
   update(birds, predator) {
-    if (this.distance(predator) < 15) {
+    if (this.distance(predator) < 15 * this.size) {
       this.dead = true;
-      this.color = 'grey';
+      this.color = "grey";
     }
     if (!this.dead) {
       // Update the velocities according to each rule
@@ -198,7 +199,8 @@ class Bird {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     if (DRAW_TRAIL) {
-      ctx.strokeStyle = this.color + "66";
+      ctx.lineWidth = 1.3 * this.size;
+      ctx.strokeStyle = this.color + "90";
       ctx.beginPath();
       ctx.moveTo(bird.history[0][0], bird.history[0][1]);
       for (const point of bird.history) {
