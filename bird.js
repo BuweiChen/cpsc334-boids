@@ -54,7 +54,7 @@ class Bird {
 
   keepWithinBounds() {
     let bird = this;
-    const margin = 200;
+    const margin = 150 * this.size;
 
     if (bird.x < margin) {
       bird.dx += this.turnFactor;

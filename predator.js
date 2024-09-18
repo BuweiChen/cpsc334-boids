@@ -3,13 +3,13 @@ class Predator extends Bird {
     super(
       width,
       height,
-      150,
+      175,
       6,
       0.8,
       0.001,
       -0.02,
       0,
-      150,
+      175,
       0,
       (1.75 * Math.min(width, height)) / 600,
       "#FF0000"
